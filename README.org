@@ -1,0 +1,354 @@
+# -*- mode: org;  coding: utf-8; -*-
+#+SPDX-License-Identifier: GPL-3.0-or-later
+#+author: nik gaffney <nik@fo.am>
+#+title:  QMK config for crkbd
+
+The Corne keyboard is a split keyboard with 3x6 column staggered keys and 3 thumb keys.
+
+[[file:img/crkbd-phosphorous.jpg]]
+
+
+The keyboard can be programmed using the [[https://qmk.fm/][QMK]] firmware for the [[https://github.com/foostan/crkbd][crkbd]]. With the help of the [[https://github.com/mihaiolteanu/mugur][mugur]] interface this file can be used as a literate config to generate a keymap and the relevant build files for the QMK firmware…
+
+For reference, comparison and reading the [[https://github.com/manna-harbour/qmk_firmware/blob/crkbd/keyboards/crkbd/keymaps/manna-harbour/readme.org][Crkbd Keymap by Manna Harbour]] and [[https://github.com/qmk/qmk_firmware/tree/master/users/drashna][drashna]] provide good examples of detailed configs, and the [[https://github.com/qmk/qmk_firmware/tree/master/keyboards/crkbd/keymaps][QMK tree]] has further specifics and a wide range of examples.
+
+* general principles
+
+This config uses a mulit-layer qwerty layout which has emerged from a combination of writing and programming using emacs (and emacs style keybindings) on macos and linux. The numeric layer has numbers on the home row and shifted symbols on the first row, with commonly used brackets on the third row symmetrically between sides. The emacs layer(s) provide both command and prefix keys. The movement layer provides arrows (as WASD) and jump keys on the left and mouse keys (when enabled) on the right. There is a QMK reset key on each half of the keyboard.
+
+* specific mappings
+
+Details of keyboard layout, layers, macros and general confusion can be found in the [[https://docs.qmk.fm/#/][QMK docs]]
+
+*Layers*
+  - qwerty and modifiers.
+  - numbers, symbols & brackets.
+  - movement. arrows & jump on the left,  mouse keys on the right
+  - emacs layers.
+  - qmk control layer.
+
+*Modifiers*
+  - Left thumb (base layer) Emacs layer, =KC_LAPO,= and GUI (held) or space (tap)
+  - Right thumb (base layer) Enter, =KC_RAPC,= and Toggle numeric layer
+
+The =KC_LAPO= key is Left Alt when held and =(= when tapped, it can be used as =Meta=. The =KC_RAPC= key is Right Alt when held and =)= when tapped, it can be used for accents and non-ascii characters with the international macos input sources.
+
+The =emacs= layer is activated with Left-thumb-outer (=L30=) and the =hypm= layer can be activated with Left-thumb-outer, right-thumb-outer (=R32=) and can be used to provide the =H-= prefix bindings defined in =.emacs=  The =hyper= key seen by emacs  is mapped to =KC_RGUI= rather than the =KC_HYPR= modifier combination (see also the “[[https://github.com/qmk/qmk_firmware/issues/2179][the infamous Apple Fn key]]” for compatibility)
+
+*QMK Reset*
+ - Left. =L20= & =L30=
+ - Right. =R25= & =R05=
+
+To create a new layer, start with a blank layer.
+
+#+BEGIN_SRC emacs-lisp :tangle no :results silent :eval no
+("blank"
+ --- --- --- --- --- ---    --- --- --- --- --- ---
+ --- --- --- --- --- ---    --- --- --- --- --- ---
+ --- --- --- --- --- ---    --- --- --- --- --- ---
+              --- --- ---  --- --- --- )
+#+END_SRC
+
+Details of the =mugur= keycode naming can be found in the documentation of  =mugur--symbol=
+
+#+BEGIN_SRC emacs-lisp :tangle no :results silent
+(helpful-callable 'mugur--symbol)
+#+END_SRC
+
+A complete keymap can be defined within =mugur-mugur= which will generate the required files to build the firmware.
+
+#+name: keymap
+#+BEGIN_SRC emacs-lisp :tangle no :results silent :eval query
+(require 'mugur)
+
+(let ((mugur-qmk-path       "~/qmk_firmware")
+      (mugur-keyboard-name   "crkbd")
+      (mugur-layout-name     "LAYOUT_split_3x6_3")
+      (mugur-keymap-name     "zzkt4")
+      (mugur-tapping-term    175))
+
+ (mugur-mugur
+  '(("base"
+      tab  q   w   e   r   t      y   u   i   o    p   bspace
+      C    a   s   d   f   g      h   j   k   l   ?\;  (LT move ?\')
+      S    z   x   c   v   b      n   m  ?\, dot  ?\?  (MO qmik)
+     (MO emacs) lapo (G space)   ent rapc (TG numeric))
+
+     ("numeric"
+       ~  ?\!  ?\@  ?\# ?\$ ?\%     ?\^  ?\&  ?\*   -   =  bspace
+       0   1    2    3   4    5      6    7    8    9   0  (LT move ent)
+       S  --- ?\< ?\{  ?\[  ?\(     ?\)  ?\]  ?\}  ?\>  |  (MO emacs)
+               (TG qmik) C-M ---   --- S (TG numeric))
+
+     ("move"
+       --- M-v   up   ---  --- ---    --- --- --- --- --- ---
+       C-a left down right C-e ---    --- --- --- --- --- ---
+       --- M-<  C-v   M->  --- ---    --- --- --- --- --- ---
+                        --- --- ---  ---  --- --- )
+
+     ("emacs"
+       esc  --- --- (C-x 0) (C-x 2) (C-x 3)   (C-x 4 t)  --- --- --- --- ---
+       ---  --- M-% --- --- (M-x "gtd" ent)   (C-x b)    --- --- "λ" --- ---
+      reset --- M-x C-c ---  ?\(               ?\)  (M-x "magit" ent) --- --- --- ---
+                     --- ---  (H-i e)             (C-x 8) --- (MO hypm))
+
+     ("hypm"
+        --- --- --- --- --- ---    --- --- H-i  (H-i o) (H-i l) ---
+        --- --- --- H-d --- ---    --- --- ---  --- --- ---
+        --- --- --- --- --- ---    --- H-m (H-m s) --- --- ---
+                     --- --- ---  ---  --- --- )
+
+     ("qmik"
+       ---    rgb_tog rgb_mod --- --- ---    --- --- --- --- --- reset
+      rgb_sad rgb_vad rgb_hud --- --- ---    --- --- --- --- --- ---
+      rgb_sai rgb_vai rgb_hui --- --- ---    --- --- --- ---  S  ---
+                               --- --- ---  ---  --- --- )
+     )))
+#+END_SRC
+
+** keymap.c
+
+This will generate a =keymap.c= file with =org-babel-tangle= and should be run before the elisp code block for the keymap described above.
+
+#+BEGIN_SRC c :tangle keymap.c
+#include QMK_KEYBOARD_H
+#include "version.h"
+#+END_SRC
+
+ =mugur= will write the keymap and only overwrite the region between these comments.
+
+#+BEGIN_SRC c :tangle keymap.c
+// START-MUGUR-REGION
+// END-MUGUR-REGION
+#+END_SRC
+
+add an fm logo animation…
+
+#+BEGIN_SRC c :tangle keymap.c
+#ifdef OLED_DRIVER_ENABLE
+// 'fm_logo-128x32', 32x128px
+static void render_logo(void) {
+  static const char PROGMEM fm_logo[] = {
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x20, 0x70, 0x78, 0x78, 0x78, 0x78, 0x38, 0x30, 0x60, 0xd0, 0xc0, 0x80,
+0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+0x83, 0xcf, 0xfe, 0xfc, 0xf0, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x06, 0x06, 0x0c, 0x0e, 0x1e, 0x1e, 0x3e, 0x7e, 0xfe, 0xff,
+0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfc, 0x78, 0x70, 0x70, 0x60, 0x60, 0x60, 0x60, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xc0, 0xc0, 0xc0, 0xe0, 0xfb,
+0xff, 0xff, 0x83, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x03, 0x03, 0x07, 0x07, 0x0f, 0x1f, 0x7f, 0xff, 0xff,
+0x7f, 0x3f, 0x3f, 0x1f, 0x1f, 0x1e, 0x1e, 0x1c, 0x1c, 0x18, 0x18, 0x18, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x30, 0x30, 0x60, 0x60, 0x60, 0xe0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf8, 0xf8, 0xfe, 0xff, 0xf8,
+0xe0, 0xe0, 0xc0, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x03, 0x0f, 0xff, 0xff, 0xff, 0x1f, 0x0f, 0x07,
+0x07, 0x07, 0x03, 0x03, 0x83, 0x83, 0x83, 0x83, 0x83, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x07, 0x0e, 0x1c, 0xf8,
+0xfc, 0xfe, 0x6f, 0xe7, 0xf3, 0xf9, 0xf9, 0xf9, 0xf9, 0xf3, 0xe3, 0x07, 0x1e, 0xfc, 0xf0, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+0x07, 0x0f, 0x1c, 0x38, 0x33, 0x33, 0x77, 0x77, 0x33, 0x33, 0x39, 0x1c, 0x0f, 0x07, 0x01, 0x00
+  };
+  oled_write_raw_P(fm_logo, sizeof(fm_logo));
+}
+
+// rotate the OLEDs
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+  if (isLeftHand) {
+    return OLED_ROTATION_270;
+  } else {
+    return OLED_ROTATION_90;
+  }
+}
+
+void oled_task_user(void) {
+  render_logo();
+  oled_scroll_set_speed(5);
+  oled_scroll_left();
+}
+#endif
+#+END_SRC
+
+turn on (or off) debug info (check that =CONSOLE_ENABLE= is set accordingly in =rules.mk= )
+
+#+BEGIN_SRC c :tangle keymap.c
+void keyboard_post_init_user(void) {
+  debug_enable=true;
+  //debug_matrix=true;
+  debug_keyboard=true;
+  //debug_mouse=true;
+}
+#+END_SRC
+
+** rules.mk
+
+this will create a =rules.mk= file with some specifics for the [[https://github.com/qmk/qmk_firmware/blob/c66df1664497546f32662409778731143e45a552/keyboards/crkbd/readme.md][Corne Keyboard (CRKBD)]]
+
+#+BEGIN_SRC makefile :tangle rules.mk
+BOOTLOADER = atmel-dfu  # Elite-C
+
+RGBLIGHT_ENABLE = no
+RGB_MATRIX_ENABLE = yes # WS2812 # per-key RGB and underglow
+
+UNICODE_ENABLE = yes
+
+OLED_DRIVER_ENABLE = yes
+MOUSEKEY_ENABLE = no  # use mouse keys or not
+CONSOLE_ENABLE = no  # debug info
+#+END_SRC
+
+** config.h
+
+This will generate a =config.h= file
+
+#+BEGIN_SRC c++ :tangle config.h
+#define EE_HANDS
+#+END_SRC
+
+taping timing and tap/hold (as seen in the [[https://beta.docs.qmk.fm/using-qmk/software-features/tap_hold][QMK docs]])
+
+#+BEGIN_SRC c++ :tangle config.h
+#define TAPPING_TERM 175
+#define COMBO_TERM 300
+#define RETRO_TAPPING
+#+END_SRC
+
+Unicode input method (tangle as required)
+
+#+BEGIN_SRC c :tangle config.h
+#define UNICODE_SELECTED_MODES UC_MAC
+#+END_SRC
+
+#+BEGIN_SRC c :tangle no
+#define UNICODE_SELECTED_MODES UC_LNX, UC_MAC
+#+END_SRC
+
+for VIA compatibility (if needed)
+
+#+BEGIN_SRC c :tangle config.h
+#define VENDOR_ID  0x4653
+#define PRODUCT_ID 0x0001
+#+END_SRC
+
+RGB matrix & lighting effects
+
+#+BEGIN_SRC c :tangle config.h
+#ifdef RGB_MATRIX_ENABLE
+#define RGB_MATRIX_KEYPRESSES // reacts to keypresses
+#define RGB_DISABLE_WHEN_USB_SUSPENDED true // turn off effects when suspended
+#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
+#define RGB_MATRIX_LED_PROCESS_LIMIT (DRIVER_LED_TOTAL + 4) / 5 // limits the number of LEDs to process in an animation per task run (increases keyboard responsiveness)
+#define RGB_MATRIX_LED_FLUSH_LIMIT 16 // limits in milliseconds how frequently an animation will update the LEDs. 16 (16ms) is equivalent to limiting to 60fps (increases keyboard responsiveness)
+#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150 // limits maximum brightness of LEDs to 150 out of 255. Higher may cause the controller to crash.
+#define RGB_MATRIX_HUE_STEP 8
+#define RGB_MATRIX_SAT_STEP 8
+#define RGB_MATRIX_VAL_STEP 8
+#define RGB_MATRIX_SPD_STEP 10
+#+END_SRC
+
+Disable the animations you don't want/need. You will need to disable a good number of these because they take up a lot of space. Disable until you can successfully compile your firmware.
+
+#+BEGIN_SRC c :tangle config.h
+#define DISABLE_RGB_MATRIX_ALPHAS_MODS
+#define DISABLE_RGB_MATRIX_GRADIENT_UP_DOWN
+/* #define DISABLE_RGB_MATRIX_BREATHING */
+#define DISABLE_RGB_MATRIX_CYCLE_ALL
+#define DISABLE_RGB_MATRIX_CYCLE_LEFT_RIGHT
+#define DISABLE_RGB_MATRIX_CYCLE_UP_DOWN
+#define DISABLE_RGB_MATRIX_CYCLE_OUT_IN
+#define DISABLE_RGB_MATRIX_CYCLE_OUT_IN_DUAL
+#define DISABLE_RGB_MATRIX_RAINBOW_MOVING_CHEVRON
+#define DISABLE_RGB_MATRIX_DUAL_BEACON
+#define DISABLE_RGB_MATRIX_RAINBOW_BEACON
+#define DISABLE_RGB_MATRIX_RAINBOW_PINWHEELS
+#define DISABLE_RGB_MATRIX_RAINDROPS
+#define DISABLE_RGB_MATRIX_JELLYBEAN_RAINDROPS
+/* #define DISABLE_RGB_MATRIX_TYPING_HEATMAP  */
+#define DISABLE_RGB_MATRIX_DIGITAL_RAIN
+#define DISABLE_RGB_MATRIX_SOLID_REACTIVE
+#define DISABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
+#define DISABLE_RGB_MATRIX_SOLID_REACTIVE_WIDE
+#define DISABLE_RGB_MATRIX_SOLID_REACTIVE_MULTIWIDE
+#define DISABLE_RGB_MATRIX_SOLID_REACTIVE_CROSS
+#define DISABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS
+#define DISABLE_RGB_MATRIX_SOLID_REACTIVE_NEXUS
+#define DISABLE_RGB_MATRIX_SOLID_REACTIVE_MULTINEXUS
+#define DISABLE_RGB_MATRIX_SPLASH
+#define DISABLE_RGB_MATRIX_MULTISPLASH
+#define DISABLE_RGB_MATRIX_SOLID_SPLASH
+#define DISABLE_RGB_MATRIX_SOLID_MULTISPLASH
+#+END_SRC
+
+Default colours & modes
+
+#+BEGIN_SRC c :tangle config.h
+#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_TYPING_HEATMAP
+#define RGB_MATRIX_STARTUP_HUE 128 // HSV_CYAN
+#define RGB_MATRIX_STARTUP_SAT 255
+#define RGB_MATRIX_STARTUP_VAL RGB_MATRIX_MAXIMUM_BRIGHTNESS
+// #define RGB_MATRIX_STARTUP_SPD
+#endif
+#+END_SRC
+
+** build (generate, compile and flash cycle)
+
+first tangle this file
+
+#+BEGIN_SRC emacs-lisp :tangle no :results silent
+(org-babel-tangle)
+#+END_SRC
+
+then write the keymap as defined above
+
+#+BEGIN_SRC emacs-lisp :noweb yes :tangle no :results silent
+<<keymap()>>
+#+END_SRC
+
+then compile and/or write to the keyboard
+
+#+name: qmk
+#+BEGIN_SRC shell :dir ~/qmk_firmware :wrap SRC text :tangle no
+qmk compile -kb crkbd -km zzkt4
+#+END_SRC
+
+#+name: qmk
+#+BEGIN_SRC shell :dir ~/qmk_firmware :wrap SRC text :tangle no
+qmk flash -km zzkt4 -bl dfu
+#+END_SRC
+
+or flash one side at a time…
+
+#+name: qmk
+#+BEGIN_SRC shell :dir ~/qmk_firmware  :wrap SRC text :tangle no
+qmk flash -km zzkt4 -bl dfu-split-left
+#+END_SRC
+
+#+name: qmk
+#+BEGIN_SRC shell :dir ~/qmk_firmware wrap SRC text :tangle no
+qmk flash -km zzkt4 -bl dfu-split-right
+#+END_SRC
+
+* illustrative
+
+#+caption: blank crkbd layout
+[[file:img/crkbd-default-layer.svg]]
+
+* further
+
+ - [[https://config.qmk.fm/#/crkbd/rev1/common/LAYOUT_split_3x6_3][QMK Configurator]] (for crkbd)
+ - [[https://josef-adamcik.cz/electronics/corne-keyboard-build-log.html][Build log - Josef Adamčík]]
+ - [[https://thomasbaart.nl/2018/11/26/corne-keyboard-helidox-build-log/][Build log - Thomas Baart]]
+ - [[https://en.wikipedia.org/wiki/Keyboard_layout][Keyboard Layouts]] (wikipedia)

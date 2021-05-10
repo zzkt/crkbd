@@ -28,8 +28,8 @@ Details of keyboard layout, layers, macros and general confusion can be found in
   - qmk control layer.
 
 *Modifiers*
-  - Left thumb (base layer) Emacs layer, =KC_LAPO,= and GUI (held) or space (tap)
-  - Right thumb (base layer) Enter, =KC_RAPC,= and Toggle numeric layer
+  - Left thumb (base layer) Emacs layer, =KC_LAPO=, and GUI (held) or space (tap)
+  - Right thumb (base layer) Enter, =KC_RAPC=, and Toggle numeric layer
 
 The =KC_LAPO= key is Left Alt when held and =(= when tapped, it can be used as =Meta=. The =KC_RAPC= key is Right Alt when held and =)= when tapped, it can be used for accents and non-ascii characters with the international macos input sources.
 

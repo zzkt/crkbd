@@ -1,5 +1,4 @@
 # -*- mode: org;  coding: utf-8; -*-
-#+SPDX-License-Identifier: GPL-3.0-or-later
 #+author: nik gaffney <nik@fo.am>
 #+title:  QMK config for crkbd
 
@@ -52,7 +51,7 @@ To create a new layer, start with a blank layer.
 Details of the =mugur= keycode naming can be found in the documentation of  =mugur--symbol=
 
 #+BEGIN_SRC emacs-lisp :tangle no :results silent
-(helpful-callable 'mugur--symbol)
+(find-function 'mugur--symbol)
 #+END_SRC
 
 A complete keymap can be defined within =mugur-mugur= which will generate the required files to build the firmware.
@@ -195,7 +194,7 @@ void keyboard_post_init_user(void) {
 
 ** rules.mk
 
-this will create a =rules.mk= file with some specifics for the [[https://github.com/qmk/qmk_firmware/blob/c66df1664497546f32662409778731143e45a552/keyboards/crkbd/readme.md][Corne Keyboard (CRKBD)]]
+this will create a =rules.mk= file with some specifics for the [[https://github.com/qmk/qmk_firmware/tree/master/keyboards/crkbd][Corne Keyboard (CRKBD)]]
 
 #+BEGIN_SRC makefile :tangle rules.mk
 BOOTLOADER = atmel-dfu  # Elite-C
@@ -214,13 +213,13 @@ CONSOLE_ENABLE = no  # debug info
 
 This will generate a =config.h= file
 
-#+BEGIN_SRC c++ :tangle config.h
+#+BEGIN_SRC c :tangle config.h
 #define EE_HANDS
 #+END_SRC
 
 taping timing and tap/hold (as seen in the [[https://beta.docs.qmk.fm/using-qmk/software-features/tap_hold][QMK docs]])
 
-#+BEGIN_SRC c++ :tangle config.h
+#+BEGIN_SRC c :tangle config.h
 #define TAPPING_TERM 175
 #define COMBO_TERM 300
 #define RETRO_TAPPING
@@ -245,7 +244,7 @@ for VIA compatibility (if needed)
 
 RGB matrix & lighting effects
 
-#+BEGIN_SRC c :tangle config.h
+#+BEGIN_SRC c++ :tangle config.h
 #ifdef RGB_MATRIX_ENABLE
 #define RGB_MATRIX_KEYPRESSES // reacts to keypresses
 #define RGB_DISABLE_WHEN_USB_SUSPENDED true // turn off effects when suspended
@@ -261,7 +260,7 @@ RGB matrix & lighting effects
 
 Disable the animations you don't want/need. You will need to disable a good number of these because they take up a lot of space. Disable until you can successfully compile your firmware.
 
-#+BEGIN_SRC c :tangle config.h
+#+BEGIN_SRC c++ :tangle config.h
 #define DISABLE_RGB_MATRIX_ALPHAS_MODS
 #define DISABLE_RGB_MATRIX_GRADIENT_UP_DOWN
 /* #define DISABLE_RGB_MATRIX_BREATHING */

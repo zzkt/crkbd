@@ -32,7 +32,7 @@ Details of keyboard layout, layers, macros and general confusion can be found in
 
 The =KC_LAPO= key is Left Alt when held and =(= when tapped, it can be used as =Meta=. The =KC_RAPC= key is Right Alt when held and =)= when tapped, it can be used for accents and non-ascii characters with the international macos input sources.
 
-The =emacs= layer is activated with Left-thumb-outer (=L30=) and the =hypm= layer can be activated with Left-thumb-outer, right-thumb-outer (=R32=) and can be used to provide the =H-= prefix bindings defined in =.emacs=  The =hyper= key seen by emacs  is mapped to =KC_RGUI= rather than the =KC_HYPR= modifier combination (see also the “[[https://github.com/qmk/qmk_firmware/issues/2179][the infamous Apple Fn key]]” for compatibility)
+The =emacs= layer is activated with Left-thumb-outer (=L30=) and the =hypm= layer can be activated with Left-thumb-outer, right-thumb-outer (=R32=) and can be used to provide the =H-= prefix bindings defined in =.emacs=  The =hyper= key seen by emacs  can be mapped to =KC_RGUI= rather than the =KC_HYPR= modifier combination (see also the “[[https://github.com/qmk/qmk_firmware/issues/2179][the infamous Apple Fn key]]” for compatibility)
 
 *QMK Reset*
  - Left. =L20= & =L30=
@@ -74,9 +74,9 @@ A complete keymap can be defined within =mugur-mugur= which will generate the re
      (MO emacs) lapo (G space)   ent rapc (TG numeric))
 
      ("numeric"
-       ~  ?\!  ?\@  ?\# ?\$ ?\%     ?\^  ?\&  ?\*   -   =  bspace
-       0   1    2    3   4    5      6    7    8    9   0  (LT move ent)
-       S  --- ?\< ?\{  ?\[  ?\(     ?\)  ?\]  ?\}  ?\>  |  (MO emacs)
+       ~  ?\!  ?\@  ?\#  ?\$  ?\%     ?\^  ?\&  ?\*   -   =  bspace
+       0   1    2    3    4    5       6    7    8    9   0  (LT move ent)
+       S   `  ?\<   ?\{  ?\[  ?\(     ?\)  ?\]  ?\}  ?\>  |  (MO emacs)
                (TG qmik) C-M ---   --- S (TG numeric))
 
      ("move"
@@ -89,7 +89,7 @@ A complete keymap can be defined within =mugur-mugur= which will generate the re
        esc  --- --- (C-x 0) (C-x 2) (C-x 3)   (C-x 4 t)  --- --- --- --- ---
        ---  --- M-% --- --- (M-x "gtd" ent)   (C-x b)    --- --- "λ" --- ---
       reset --- M-x C-c ---  ?\(               ?\)  (M-x "magit" ent) --- --- --- ---
-                     --- ---  (H-i e)             (C-x 8) --- (MO hypm))
+                     --- ---  (H-i e)        (C-x 8) --- (MO hypm))
 
      ("hypm"
         --- --- --- --- --- ---    --- --- H-i  (H-i o) (H-i l) ---
@@ -98,9 +98,9 @@ A complete keymap can be defined within =mugur-mugur= which will generate the re
                      --- --- ---  ---  --- --- )
 
      ("qmik"
-       ---    rgb_tog rgb_mod --- --- ---    --- --- --- --- --- reset
-      rgb_sad rgb_vad rgb_hud --- --- ---    --- --- --- --- --- ---
-      rgb_sai rgb_vai rgb_hui --- --- ---    --- --- --- ---  S  ---
+        -x-   rgb_tog rgb_mod -x- -x- -x-    --- --- --- --- --- reset
+      rgb_sad rgb_vad rgb_hud -x- -x- -x-    --- --- --- --- --- ---
+      rgb_sai rgb_vai rgb_hui -x- -x- -x-    --- --- --- ---  S  ---
                                --- --- ---  ---  --- --- )
      )))
 #+END_SRC

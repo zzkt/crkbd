@@ -13,7 +13,7 @@ For reference, comparison and reading the [[https://github.com/manna-harbour/qmk
 
 * general principles
 
-This config uses a mulit-layer qwerty layout which has emerged from a combination of writing and programming using emacs (and emacs style keybindings) on macos and linux. The numeric layer has numbers on the home row and shifted symbols on the first row, with commonly used brackets on the third row symmetrically between sides. The emacs layer(s) provide both command and prefix keys. The movement layer provides arrows (as WASD) and jump keys on the left and mouse keys (when enabled) on the right. There is a QMK reset key on each half of the keyboard.
+This config uses a mulit-layer qwerty layout which has emerged from a combination of writing and programming using emacs (and emacs style keybindings) on macos and linux. The numeric layer has numbers on the home row and shifted symbols on the first row, with commonly used brackets on the third row symmetrically between sides. The emacs layer(s) provide both command and prefix keys. The movement layer provides arrows (as WASD and HJKL) and jump keys on the left and mouse keys (when enabled) on the right. There is a QMK reset key on each half of the keyboard.
 
 * specific mappings
 
@@ -30,7 +30,7 @@ Details of keyboard layout, layers, macros and general confusion can be found in
   - Left thumb (base layer) Emacs layer, =KC_LAPO=, and GUI (held) or space (tap)
   - Right thumb (base layer) Enter, =KC_RAPC=, and Toggle numeric layer
 
-The =KC_LAPO= key is Left Alt when held and =(= when tapped, it can be used as =Meta=. The =KC_RAPC= key is Right Alt when held and =)= when tapped, it can be used for accents and non-ascii characters with the international macos input sources.
+The =KC_LAPO= key is Left Alt when held and =(= when tapped, it can be used as =Meta=. The =KC_RAPC= key is Right Alt when held and =)= when tapped, it can be used for accents and non-ascii characters with the international macOS input sources.
 
 The =emacs= layer is activated with Left-thumb-outer (=L30=) and the =hypm= layer can be activated with Left-thumb-outer, right-thumb-outer (=R32=) and can be used to provide the =H-= prefix bindings defined in =.emacs=  The =hyper= key seen by emacs  can be mapped to =KC_RGUI= rather than the =KC_HYPR= modifier combination (see also the “[[https://github.com/qmk/qmk_firmware/issues/2179][the infamous Apple Fn key]]” for compatibility)
 
@@ -61,41 +61,41 @@ A complete keymap can be defined within =mugur-mugur= which will generate the re
 (require 'mugur)
 
 (let ((mugur-qmk-path       "~/qmk_firmware")
-      (mugur-keyboard-name   "crkbd")
-      (mugur-layout-name     "LAYOUT_split_3x6_3")
-      (mugur-keymap-name     "zzkt4")
+      (mugur-keyboard-name  "crkbd")
+      (mugur-layout-name    "LAYOUT_split_3x6_3")
+      (mugur-keymap-name    "zzkt4")
       (mugur-tapping-term    175))
 
  (mugur-mugur
   '(("base"
-      tab  q   w   e   r   t      y   u   i   o    p   bspace
-      C    a   s   d   f   g      h   j   k   l   ?\;  (LT move ?\')
-      S    z   x   c   v   b      n   m  ?\, dot  ?\?  (MO qmik)
-     (MO emacs) lapo (G space)   ent rapc (TG numeric))
+        tab    q   w   e   r   t      y   u   i    o    p     bspace
+         C     a   s   d   f   g      h   j   k    l  scolon (LT move ?\')
+     (LT S up) z   x   c   v   b      n   m comma dot  slash (LT hypm down)
+         (MO emacs) lapo (G space)  ent rapc (TT numeric))
 
      ("numeric"
-       ~  ?\!  ?\@  ?\#  ?\$  ?\%     ?\^  ?\&  ?\*   -   =  bspace
-       0   1    2    3    4    5       6    7    8    9   0  (LT move ent)
-       S   `  ?\<   ?\{  ?\[  ?\(     ?\)  ?\]  ?\}  ?\>  |  (MO emacs)
-               (TG qmik) C-M ---   --- S (TG numeric))
+       "~"          ?\!   ?\@   ?\#  ?\$  ?\%     ?\^  ?\&  ?\*   -   =  bspace
+        0            1     2     3    4    5       6    7    8    9   0  (LT move ent)
+       (LT S left)  "`"   ---   ?\\  ?\{  ?\[     ?\]  ?\} comma dot  |  (LT S right)
+                             (TG qmik) lapo ---  --- rapc ---)
 
      ("move"
-       --- M-v   up   ---  --- ---    --- --- --- --- --- ---
-       C-a left down right C-e ---    --- --- --- --- --- ---
-       --- M-<  C-v   M->  --- ---    --- --- --- --- --- ---
-                        --- --- ---  ---  --- --- )
+       --- M-v   up   ---  --- ---      ---  ---  ---  ---  --- ---
+       C-a left down right C-e ---     left  up  down right --- ---
+       --- M-<  C-v   M->  --- ---      ---  ---  ---  ---  --- ---
+                            C  S ---   ---  --- --- )
 
      ("emacs"
-       esc  --- --- (C-x 0) (C-x 2) (C-x 3)   (C-x 4 t)  --- --- --- --- ---
+       esc  --- --- (C-x 0) (C-x 2) (C-x 3)   (C-x 4 t)  --- --- (C-M o) --- ---
        ---  --- M-% --- --- (M-x "gtd" ent)   (C-x b)    --- --- "λ" --- ---
       reset --- M-x C-c ---  ?\(               ?\)  (M-x "magit" ent) --- --- --- ---
                      --- ---  (H-i e)        (C-x 8) --- (MO hypm))
 
      ("hypm"
-        --- --- --- --- --- ---    --- --- H-i  (H-i o) (H-i l) ---
-        --- --- --- H-d --- ---    --- --- ---  --- --- ---
-        --- --- --- --- --- ---    --- H-m (H-m s) --- --- ---
-                     --- --- ---  ---  --- --- )
+         x  --- --- --- --- ---       ---     ---     H-i   (H-i o) (H-i l) ---
+        --- --- --- H-d --- ---       ---     ---     ---     ---     ---   ---
+        --- --- --- --- --- ---     (H-m n) (H-m m) (H-m s)   ---     ---   ---
+                     --- --- ---   ---  --- --- )
 
      ("qmik"
         -x-   rgb_tog rgb_mod -x- -x- -x-    --- --- --- --- --- reset
@@ -185,10 +185,10 @@ turn on (or off) debug info (check that =CONSOLE_ENABLE= is set accordingly in =
 
 #+BEGIN_SRC c :tangle keymap.c
 void keyboard_post_init_user(void) {
-  debug_enable=true;
-  //debug_matrix=true;
-  debug_keyboard=true;
-  //debug_mouse=true;
+  // debug_enable=true;
+  // debug_matrix=true;
+  // debug_keyboard=true;
+  // debug_mouse=true;
 }
 #+END_SRC
 
@@ -197,7 +197,10 @@ void keyboard_post_init_user(void) {
 this will create a =rules.mk= file with some specifics for the [[https://github.com/qmk/qmk_firmware/tree/master/keyboards/crkbd][Corne Keyboard (CRKBD)]]
 
 #+BEGIN_SRC makefile :tangle rules.mk
-BOOTLOADER = atmel-dfu  # Elite-C
+# START-MUGUR-REGION
+# END-MUGUR-REGION
+
+BOOTLOADER = dfu-ee  # Elite-C
 
 RGBLIGHT_ENABLE = no
 RGB_MATRIX_ENABLE = yes # WS2812 # per-key RGB and underglow
@@ -207,11 +210,18 @@ UNICODE_ENABLE = yes
 OLED_DRIVER_ENABLE = yes
 MOUSEKEY_ENABLE = no  # use mouse keys or not
 CONSOLE_ENABLE = no  # debug info
+
+VIA_ENABLE = yes # to enable configuraiton with VIA
 #+END_SRC
 
 ** config.h
 
 This will generate a =config.h= file
+
+#+BEGIN_SRC c :tangle config.h
+// START-MUGUR-REGION
+// END-MUGUR-REGION
+#+END_SRC
 
 #+BEGIN_SRC c :tangle config.h
 #define EE_HANDS
@@ -319,31 +329,36 @@ then write the keymap as defined above
 then compile and/or write to the keyboard
 
 #+name: qmk
-#+BEGIN_SRC shell :dir ~/qmk_firmware :wrap SRC text :tangle no
+#+BEGIN_SRC shell :dir ~/qmk_firmware :wrap SRC text :results raw :tangle no
 qmk compile -kb crkbd -km zzkt4
 #+END_SRC
 
 #+name: qmk
-#+BEGIN_SRC shell :dir ~/qmk_firmware :wrap SRC text :tangle no
+#+BEGIN_SRC shell :dir ~/qmk_firmware :wrap SRC text :results raw  :tangle no
 qmk flash -km zzkt4 -bl dfu
 #+END_SRC
 
 or flash one side at a time…
 
 #+name: qmk
-#+BEGIN_SRC shell :dir ~/qmk_firmware  :wrap SRC text :tangle no
+#+BEGIN_SRC shell :dir ~/qmk_firmware  :wrap SRC text :results raw :tangle no
 qmk flash -km zzkt4 -bl dfu-split-left
 #+END_SRC
 
 #+name: qmk
-#+BEGIN_SRC shell :dir ~/qmk_firmware wrap SRC text :tangle no
+#+BEGIN_SRC shell :dir ~/qmk_firmware wrap SRC text :results raw :tangle no
 qmk flash -km zzkt4 -bl dfu-split-right
 #+END_SRC
 
 * illustrative
 
-#+caption: blank crkbd layout
-[[file:img/crkbd-default-layer.svg]]
+#+caption: alphanumeric layers (0-2)
+[[file:img/zzkt--alphalikes.png]]
+
+#+caption: emacs layers (3-4)
+[[file:img/zzkt--emacs.png]]
+
+see also [[http://www.keyboard-layout-editor.com/##@_name=zzkt%20-%20alphalikes&author=https%2F:%2F%2F%2F%2Fgithub.com%2F%2Fzzkt%2F%2Fcrkbd&notes=layers%2F:%0A-%200%20default%0A-%201%20numeric%0A-%202%20move%0A-%203%20emacs%0A-%204%20hypm%0A-%205%20qmik&plate:false%3B&@_x:3&t=%23000000%0A%0A%23dd3c84%3B&=%0A%0A%23%0A%0A%0A%0A%0A%0A%0AE&_x:7%3B&=%0A%0A*%0A%0A%0A%0A%0A%0A%0AI%3B&@_y:-0.9&x:2&t=%23000000%0A%0A%23dd3c84%0A%231c937f%3B&=%0A%0A%2F@%0A%E2%96%B2%0A%0A%0A%0A%0A%0AW%3B&@_y:-1&x:4&t=%23000000%0A%0A%23dd3c84%3B&=%0A%0A$%0A%0A%0A%0A%0A%0A%0AR&_x:5%3B&=%0A%0A%2F&%0A%0A%0A%0A%0A%0A%0AU&_x:1&t=%23000000%0A%0A%23dd3c84%0A%0A%0A%0A%0A%23dd3c84&fa@:0&:0&:4&:0&:0&:0&:0&:4%3B%3B&=%0A%0A%2F_%0A%0A%0A%0A%0A-%0A%0AO%3B&@_y:-0.9000000000000001&x:5&t=%23000000%0A%0A%23dd3c84&f:3%3B&=%0A%0A%25%0A%0A%0A%0A%0A%0A%0AT&_x:3&f:3%3B&=%0A%0A%5E%0A%0A%0A%0A%0A%0A%0AY%3B&@_y:-0.8999999999999999&f:3%3B&=%0A%0A~%0A%0A%0A%0ATab&_t=%23000000%0A%0A%23dd3c84%0A%231c937f&fa@:0&:0&:0&:2%3B%3B&=%0A%0A!%0AM-v%0A%0A%0A%0A%0A%0AQ&_x:11&t=%23000000%0A%0A%23dd3c84%0A%0A%0A%0A%0A%23dd3c84%3B&=%0A%0A+%0A%0A%0A%0A%0A%2F=%0A%0AP&_t=%23000000&a:7%3B&=Bksp%3B&@_y:-0.30000000000000004&x:3&t=%23000000%0A%0A%23dd3c84%0A1c937f&a:4&f:3%3B&=%0A%0A3%0A%E2%96%BA%0A%0A%0A%0A%0A%0AD&_x:7&f:3%3B&=%0A%0A8%0A%E2%96%BC%0A%0A%0A%0A%0A%0AK%3B&@_y:-0.8999999999999999&x:2&f:3%3B&=%0A%0A2%0A%E2%96%BC%0A%0A%0A%0A%0A%0AS&_x:1&t=%23000000%0A%0A%23dd3c84%0A%231c937f&f:3%3B&=%0A%0A4%0AC-e%0A%0A%0A%0A%0A%0AF&_x:5&t=%23000000%0A%0A%23dd3c84%0A1c937f&f2:0%3B&=%0A%0A7%0A%E2%96%B2%0A%0A%0A%0A%0A%0AJ&_x:1%3B&=%0A%0A9%0A%E2%96%BA%0A%0A%0A%0A%0A%0AL%3B&@_y:-0.9000000000000001&x:5&t=%23000000%0A%0A%23dd3c84%3B&=%0A%0A5%0A%0A%0A%0A%0A%0A%0AG&_x:3&t=%23000000%0A%0A%23dd3c84%0A1c937f&fa@:0&:0&:0&:1%3B%3B&=%0A%0A6%0A%E2%97%80%EF%B8%8E%0A%0A%0A%0A%0A%0AH%3B&@_y:-0.9000000000000001&t=%23000000%0A%0A%23dd3c84%0A%231c937f&f:3%3B&=%0A%0A0%0AC-a%0A%0A%0A%0A%0A%0ACtrl&=%0A%0A1%0A%E2%97%80%EF%B8%8E%0A%0A%0A%0A%0A%0AA&_x:11&t=%23000000%0A%0A%23dd3c84&fa@:0&:0&:0&:1&:0&:0&:0&:0&:0&:4%3B%3B&=%0A%0A0%0A%0A%0A%0A%0A%0A%2F:%0A%2F%3B&_f:2%3B&=%0A%0A%E2%86%B5%0A%0A%0A%0A%0A%0A%22%0A'%20(LT%202)%3B&@_y:-0.2999999999999998&x:3&t=%23000000%0A%0A%23dd3c84%0A%231c937f&f:3&fa@:0&:0&:0&:2%3B%3B&=%0A%0A%0AM%20%3E%0A%0A%0A%0A%0A%0AC&_x:7&t=%23000000&a:5&fa@:0&:0&:0&:2&:0&:0&:6%3B%3B&=%3C%0A%0A%0A%0A%0A%0A,%3B&@_y:-0.8999999999999999&x:2&t=%23000000%0A%0A%23dd3c84%0A%231c937f&a:4%3B&=%0A%0A%0AC-v%0A%0A%0A%0A%0A%0AX&_x:1&t=%23000000%0A%0A%23dd3c84%3B&=%0A%0A%7B%0A%0A%0A%0A%0A%0A%0AV&_x:5%3B&=%0A%0A%7D%0A%0A%0A%0A%0A%0A%0AM&_x:1&t=%23000000&a:5%3B&=%3E%0A%0A%0A%0A%0A%0A.%3B&@_y:-0.8999999999999999&x:5&t=%23000000%0A%0A%23dd3c84&a:4%3B&=%0A%0A%5B%0A%0A%0A%0A%0A%0A%0AB&_x:3%3B&=%0A%0A%5D%0A%0A%0A%0A%0A%0A%0AN%3B&@_y:-0.9000000000000004&t=%23000000&a:7%3B&=Shift&_t=%23000000%0A%0A%23dd3c84%0A%231c937f&a:4&fa@:0&:0&:6&:2%3B%3B&=Z%0A%0A%60%0AM%20%3C&_x:11&t=%23000000%0A%0A%23dd3c84&f:3%3B&=%0A%0A%7C%0A%0A%0A%0A%0A%0A%3F%0A%2F%2F&_t=%23dd3c84&f:2%3B&=(MO%203)%0A%0A%0A%0A%0A%0A(MO%205)%3B&@_y:-0.19999999999999973&x:3.5%3B&=(MO%205)%0A%0A%0A%0A%0A%0A(MO%203)&_x:6&t=%23000000%3B&=(TG%201)%3B&@_r:15&rx:4.5&ry:4.1&y:-0.9999999999999996&f:3%3B&=lapo%3B&@_r:30&rx:5.4&ry:4.3&y:-1.5&x:0.09999999999999964&f:2&h:1.5%3B&=(G%20spc)%3B&@_r:-30&rx:9.6&y:-1.5&x:-1.0999999999999996&f:3&h:1.5%3B&=Enter%3B&@_r:-15&rx:10.5&ry:4.1&y:-1.0999999999999996&x:-1&t=&fa@:2%3B%3B&=rapc][KLE layers (pt.1)]] and [[http://www.keyboard-layout-editor.com/##@_name=zzkt%20-%20emacs&author=https%2F:%2F%2F%2F%2Fgithub.com%2F%2Fzzkt%2F%2Fcrkbd&notes=layers%2F:%0A-%200%20default%0A-%201%20numeric%0A-%202%20move%0A-%203%20emacs%0A-%204%20hypm%0A-%205%20qmik&plate:false%3B&@_x:3&a:7%3B&=C-x%200&_x:7&t=%23000000%0A%0A%23dd3c84&a:4%3B&=%0A%0AH-i%3B&@_y:-0.9&x:2&t=%23000000&a:7%3B&=%3B&@_y:-1&x:4%3B&=C-x%202&_x:5%3B&=&_x:1&t=%23000000%0A%0A%23dd3c84%0A%0A%0A%0A%0A%23dd3c84&a:4%3B&=%0A%0AH-i%20o%0A%0A%0A%0AC-M%20o%3B&@_y:-0.9000000000000001&x:5&t=%23000000&a:7%3B&=C-x%203&_x:3%3B&=C-x%204%20t%3B&@_y:-0.8999999999999999&t=%23000000%0A%0A%23dd3c84&a:4%3B&=esc&_t=%23000000&a:7%3B&=&_x:11&t=%23000000%0A%0A%23dd3c84%0A%0A%0A%0A%0A%23dd3c84&a:4%3B&=%0A%0AH-i%20l&_t=%23000000&a:7%3B&=%3B&@_y:-0.30000000000000004&x:3&t=%23000000%0A%0A%23dd3c84%0A1c937f&a:4%3B&=%0A%0AH-d&_x:7&t=%23000000&a:7%3B&=%3B&@_y:-0.8999999999999999&x:2%3B&=M-%25&_x:1%3B&=&_x:5%3B&=&_x:1%3B&=%3B&@_y:-0.9000000000000001&x:5%3B&=(gtd)&_x:3&a:6%3B&=C-x%20b%3B&@_y:-0.9000000000000001&a:7%3B&=&=&_x:11%3B&=&_f:2%3B&=%3B&@_y:-0.2999999999999998&x:3&f:3%3B&=C-c&_x:7&t=%23000000%0A%0A%23dd3c84&a:4&fa@:0&:0&:2&:0&:0&:0&:0&:0&:0&:0%3B%3B&=%0A%0AH-m%20s%3B&@_y:-0.8999999999999999&x:2&t=%23000000&a:7%3B&=M-x&_x:1%3B&=&_x:5&t=%23000000%0A%0A%23dd3c84&a:4&fa@:0&:0&:0&:0&:0&:0&:0&:0&:0&:2%3B%3B&=%0A%0AH-m%0A%0A%0A%0A%0A%0A%0A(magit)&_x:1&t=%23000000&a:7%3B&=%3B&@_y:-0.8999999999999999&x:5%3B&=&_x:3&t=%23000000%0A%0A%23dd3c84&a:4%3B&=%0A%0AH-n%3B&@_y:-0.9000000000000004&t=%23000000%3B&=reset&_a:7%3B&=&_x:11%3B&=&_t=%23dd3c84&f:2%3B&=%3B&@_y:-0.19999999999999973&x:3.5%3B&=&_x:6&t=%23000000%3B&=(MO%204)%3B&@_r:15&rx:4.5&ry:4.1&y:-0.9999999999999996&f:3%3B&=lapo%3B&@_r:30&rx:5.4&ry:4.3&y:-1.5&x:0.09999999999999964&f:2&fa@:4%3B&h:1.5%3B&=H-i%20e%3B&@_r:-30&rx:9.6&y:-1.5&x:-1.0999999999999996&f:3&fa@:4%3B&h:1.5%3B&=C-x%208%3B&@_r:-15&rx:10.5&ry:4.1&y:-1.0999999999999996&x:-1&f:3%3B&=rapc][KLE layers (pt.2)]] etc.
 
 * further
 
